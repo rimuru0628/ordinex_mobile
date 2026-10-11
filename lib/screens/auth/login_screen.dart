@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import '../../widgets/app_logo.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/auth_service.dart';
 import '../../utils/constants.dart';
+import 'banned_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -35,12 +37,37 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      await _authService.signInWithEmail(
+      final credential = await _authService.signInWithEmail(
         email: _emailController.text,
         password: _passwordController.text,
       );
       if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed('/home');
+
+      // Check ban status first
+      final uid = credential.user!.uid;
+      final bannedUntil = await _authService.getBanStatus(uid);
+      if (!mounted) return;
+      if (bannedUntil != null) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => BannedScreen(bannedUntil: bannedUntil),
+          ),
+        );
+        return;
+      }
+
+      // Check approval status
+      final profile = await _authService.getUserProfile(uid);
+      if (!mounted) return;
+
+      final status = profile?.status ?? 'pending';
+      if (status == 'approved') {
+        Navigator.of(context).pushReplacementNamed('/home');
+      } else if (status == 'rejected') {
+        Navigator.of(context).pushReplacementNamed('/rejected');
+      } else {
+        Navigator.of(context).pushReplacementNamed('/pending');
+      }
     } on FirebaseAuthException catch (e) {
       setState(() {
         _loading = false;
@@ -97,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // ── Orange header ────────────────────────────
+                // Orange header
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(
@@ -115,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: const Column(
                     children: [
-                      Text('🐝', style: TextStyle(fontSize: 44)),
+                      AppLogo(size: 56, blendWithBackground: true),
                       SizedBox(height: 12),
                       Text(
                         appName,
@@ -129,14 +156,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(height: 4),
                       Text(
                         municipality,
-                        style:
-                            TextStyle(color: Colors.white70, fontSize: 13),
+                        style: TextStyle(color: Colors.white70, fontSize: 13),
                       ),
                     ],
                   ),
                 ),
 
-                // ── Form body ────────────────────────────────
+                // Form body
                 Padding(
                   padding: const EdgeInsets.fromLTRB(28, 28, 28, 32),
                   child: Form(
@@ -169,8 +195,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             decoration: BoxDecoration(
                               color: Colors.red.shade50,
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                  color: Colors.red.shade200),
+                              border:
+                                  Border.all(color: Colors.red.shade200),
                             ),
                             child: Row(
                               children: [
@@ -191,7 +217,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         const SizedBox(height: 24),
 
-                        // Email field
+                        // Email
                         const Text(
                           'Email Address',
                           style: TextStyle(
@@ -225,7 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         const SizedBox(height: 16),
 
-                        // Password field
+                        // Password
                         const Text(
                           'Password',
                           style: TextStyle(
@@ -257,8 +283,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: const Color(0xFF9CA3AF),
                                 size: 20,
                               ),
-                              onPressed: () => setState(
-                                  () => _obscurePassword = !_obscurePassword),
+                              onPressed: () => setState(() =>
+                                  _obscurePassword = !_obscurePassword),
                             ),
                           ),
                         ),
@@ -330,8 +356,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   fontSize: 13, color: Color(0xFF6B7280)),
                             ),
                             GestureDetector(
-                              onTap: () => Navigator.of(context)
-                                  .pushNamed('/signup'),
+                              onTap: () =>
+                                  Navigator.of(context).pushNamed('/signup'),
                               child: const Text(
                                 'Sign Up',
                                 style: TextStyle(

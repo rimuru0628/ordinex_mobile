@@ -55,6 +55,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final profile = UserModel(
         uid: user.uid,
         fullName: _nameController.text.trim(),
+        email: user.email ?? '',
         barangay: _selectedBarangay!,
         address: _addressController.text.trim(),
         phoneNumber: phone,

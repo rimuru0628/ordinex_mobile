@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../widgets/app_logo.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../models/report_model.dart';
 import '../../models/user_model.dart';
@@ -9,10 +12,11 @@ import '../../services/alert_service.dart';
 import '../../utils/constants.dart';
 import '../../widgets/bottom_nav_bar.dart';
 import '../../widgets/report_card.dart';
-import '../../widgets/bee_fab.dart';
 import '../reports/my_reports_screen.dart';
+import '../reports/report_detail_screen.dart';
 import '../alerts/alerts_screen.dart';
 import '../profile/profile_screen.dart';
+import '../auth/banned_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,10 +34,48 @@ class _HomeScreenState extends State<HomeScreen> {
   UserModel? _userProfile;
   bool _profileLoading = true;
 
+  StreamSubscription<DateTime?>? _banSubscription;
+
+  /// Live contacts from Firestore â€” falls back to hardcoded constants
+  List<MunicipalContact> _contacts = municipalContacts;
+
+  // _tabs removed — navigation is handled inline
+
   @override
   void initState() {
     super.initState();
     _loadProfile();
+    _loadContacts();
+    _startBanWatch();
+  }
+
+  Future<void> _loadContacts() async {
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection('settings')
+          .doc('contacts')
+          .get();
+      if (!mounted) return;
+      if (snap.exists) {
+        final raw = snap.data()?['contacts'];
+        if (raw is List && raw.isNotEmpty) {
+          final loaded = raw
+              .whereType<Map<String, dynamic>>()
+              .map((m) => MunicipalContact(
+                    name:  m['name']  as String? ?? '',
+                    phone: m['phone'] as String? ?? '',
+                    email: m['email'] as String? ?? '',
+                  ))
+              .where((c) => c.name.isNotEmpty || c.phone.isNotEmpty)
+              .toList();
+          if (loaded.isNotEmpty) {
+            setState(() => _contacts = loaded);
+          }
+        }
+      }
+    } catch (_) {
+      // Firestore unavailable â€” keep hardcoded fallback silently
+    }
   }
 
   Future<void> _loadProfile() async {
@@ -51,7 +93,156 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _onNavTap(int index) => setState(() => _currentIndex = index);
+  void _onNavTap(int index) {
+    setState(() => _currentIndex = index);
+    if (index == 2) {
+      // Mark global alerts as seen so the badge clears
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid != null) _alertService.markAlertsAsSeen(uid);
+    }
+  }
+
+  /// Subscribes to real-time ban status. If a ban is applied while the user
+  /// is on HomeScreen, immediately navigate to BannedScreen.
+  void _startBanWatch() {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+    _banSubscription = _authService.watchBanStatus(uid).listen((bannedUntil) {
+      if (!mounted) return;
+      if (bannedUntil != null) {
+        _banSubscription?.cancel();
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => BannedScreen(bannedUntil: bannedUntil),
+          ),
+        );
+      }
+    });
+  }
+  // ---------------------------------------------------------------------------
+  // Ban check
+  // ---------------------------------------------------------------------------
+
+  Future<void> _onReportConcernTap() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      try {
+        final snap = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .get();
+        final data        = snap.data() ?? {};
+        final bannedField = data['bannedUntil'];
+        if (bannedField != null) {
+          DateTime? bannedUntil;
+          if (bannedField is Timestamp) {
+            bannedUntil = bannedField.toDate();
+          } else {
+            bannedUntil = DateTime.tryParse(bannedField.toString());
+          }
+          if (bannedUntil != null && bannedUntil.isAfter(DateTime.now())) {
+            if (!mounted) return;
+            _showBanDialog(bannedUntil);
+            return;
+          }
+        }
+      } catch (_) {
+        // If check fails, allow navigation
+      }
+    }
+    if (!mounted) return;
+    Navigator.of(context).pushNamed('/report-form');
+  }
+
+  void _showBanDialog(DateTime bannedUntil) {
+    final remaining = bannedUntil.difference(DateTime.now());
+    final hours     = remaining.inHours;
+    final minutes   = remaining.inMinutes % 60;
+    String timeLeft;
+    if (hours > 0) {
+      timeLeft = '$hours hour${hours != 1 ? "s" : ""}'
+          '${minutes > 0 ? " and $minutes minute${minutes != 1 ? "s" : ""}" : ""}';
+    } else {
+      timeLeft = '$minutes minute${minutes != 1 ? "s" : ""}';
+    }
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Icon(Icons.block, color: Colors.red, size: 26),
+            SizedBox(width: 10),
+            Text('Account Banned',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.red.shade200),
+              ),
+              child: const Text(
+                'Your account has been temporarily banned. You cannot submit new reports during the ban period.',
+                style: TextStyle(fontSize: 13, color: Colors.red),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Row(children: [
+              const Icon(Icons.timer_outlined, size: 16, color: Color(0xFF6B7280)),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text('Ban lifts in: $timeLeft',
+                    style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF374151))),
+              ),
+            ]),
+            const SizedBox(height: 6),
+            Row(children: [
+              const Icon(Icons.calendar_today_outlined, size: 16, color: Color(0xFF6B7280)),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                    'Until: ${bannedUntil.toLocal().toString().substring(0, 16)}',
+                    style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+              ),
+            ]),
+
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('OK, understood'),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  @override
+  void dispose() {
+    _banSubscription?.cancel();
+    super.dispose();
+  }
 
   Widget _buildBody() {
     switch (_currentIndex) {
@@ -96,11 +287,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('🐝  BEE-Alert',
-                            style: TextStyle(
-                                color: Colors.white70, fontSize: 13)),
+                        const Row(
+                          children: [
+                            AppLogo(size: 22, blendWithBackground: true),
+                            SizedBox(width: 6),
+                            Text('BEE-Alert',
+                                style: TextStyle(
+                                    color: Colors.white70, fontSize: 13)),
+                          ],
+                        ),
                         StreamBuilder<int>(
-                          stream: _alertService.getUnreadCount(),
+                          stream: _alertService.getUnreadCount(uid: uid),
                           builder: (ctx, snap) {
                             final count = snap.data ?? 0;
                             return Stack(
@@ -110,8 +307,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                   icon: const Icon(
                                       Icons.notifications_outlined,
                                       color: Colors.white),
-                                  onPressed: () =>
-                                      setState(() => _currentIndex = 2),
+                                  onPressed: () {
+                                    setState(() => _currentIndex = 2);
+                                    _alertService.markAlertsAsSeen(uid);
+                                  },
                                 ),
                                 if (count > 0)
                                   Positioned(
@@ -178,8 +377,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: () =>
-                        Navigator.of(context).pushNamed('/report-form'),
+                    onPressed: _onReportConcernTap,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: gradientStart,
                       padding:
@@ -218,8 +416,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () =>
-                            setState(() => _currentIndex = 2),
+                        onPressed: () {
+                          setState(() => _currentIndex = 2);
+                          final uid2 = FirebaseAuth.instance.currentUser?.uid;
+                          if (uid2 != null) _alertService.markAlertsAsSeen(uid2);
+                        },
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: gradientStart),
                           padding:
@@ -264,7 +465,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   child: Column(
-                    children: municipalContacts.asMap().entries.map((e) {
+                    children: _contacts.asMap().entries.map((e) {
                       final i = e.key;
                       final c = e.value;
                       return Column(
@@ -274,7 +475,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               width: 40,
                               height: 40,
                               decoration: BoxDecoration(
-                        color: gradientStart.withValues(alpha: 0.1),
+                                color: gradientStart.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Icon(Icons.business_outlined,
@@ -299,7 +500,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               },
                             ),
                           ),
-                          if (i < municipalContacts.length - 1)
+                          if (i < _contacts.length - 1)
                             const Divider(height: 1, indent: 56),
                         ],
                       );
@@ -374,7 +575,16 @@ class _HomeScreenState extends State<HomeScreen> {
             }
             return SliverList(
               delegate: SliverChildBuilderDelegate(
-                (ctx, i) => ReportCard(report: reports[i]),
+                (ctx, i) => ReportCard(
+                  report: reports[i],
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => ReportDetailScreen(
+                        report: reports[i],
+                      ),
+                    ),
+                  ),
+                ),
                 childCount: reports.length,
               ),
             );
@@ -394,72 +604,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ? const Center(
               child: CircularProgressIndicator(color: gradientStart))
           : _buildBody(),
-      floatingActionButton: _currentIndex == 0
-          ? BeeFab(
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(24)),
-                  ),
-                  builder: (_) => Container(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text('🐝 BEE-Alert Help',
-                            style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'Need help? Use the options below to quickly report a concern or contact emergency services.',
-                          textAlign: TextAlign.center,
-                          style:
-                              TextStyle(color: Color(0xFF6B7280)),
-                        ),
-                        const SizedBox(height: 20),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            Navigator.of(context)
-                                .pushNamed('/report-form');
-                          },
-                          icon: const Icon(Icons.add_circle_outline),
-                          label: const Text('Report a Concern'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: gradientStart,
-                            minimumSize:
-                                const Size(double.infinity, 48),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        OutlinedButton.icon(
-                          onPressed: () async {
-                            Navigator.pop(context);
-                            final uri = Uri.parse('tel:911');
-                            if (await canLaunchUrl(uri)) {
-                              await launchUrl(uri);
-                            }
-                          },
-                          icon: const Icon(Icons.emergency_outlined,
-                              color: Colors.red),
-                          label: const Text('Call 911 Emergency',
-                              style: TextStyle(color: Colors.red)),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.red),
-                            minimumSize:
-                                const Size(double.infinity, 48),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            )
-          : null,
       bottomNavigationBar: BeeBottomNavBar(
         currentIndex: _currentIndex,
         onTap: _onNavTap,

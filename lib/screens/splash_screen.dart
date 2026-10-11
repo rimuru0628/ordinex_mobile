@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../utils/constants.dart';
+import '../widgets/app_logo.dart';
+import 'auth/banned_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -34,16 +36,37 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _navigate() async {
-    // Wait just enough for the animation to finish
     await Future.delayed(const Duration(milliseconds: 1200));
     if (!mounted) return;
 
     final user = _authService.currentUser;
-    if (user != null) {
-      // User already logged in — go straight to home
-      Navigator.of(context).pushReplacementNamed('/home');
-    } else {
+    if (user == null) {
       Navigator.of(context).pushReplacementNamed('/login');
+      return;
+    }
+
+    // Check ban first
+    final bannedUntil = await _authService.getBanStatus(user.uid);
+    if (!mounted) return;
+    if (bannedUntil != null) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => BannedScreen(bannedUntil: bannedUntil),
+        ),
+      );
+      return;
+    }
+
+    final profile = await _authService.getUserProfile(user.uid);
+    if (!mounted) return;
+
+    final status = profile?.status ?? 'pending';
+    if (status == 'approved') {
+      Navigator.of(context).pushReplacementNamed('/home');
+    } else if (status == 'rejected') {
+      Navigator.of(context).pushReplacementNamed('/rejected');
+    } else {
+      Navigator.of(context).pushReplacementNamed('/pending');
     }
   }
 
@@ -73,21 +96,7 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Bee emoji in a white circle
-                Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Center(
-                    child: Text(
-                      '🐝',
-                      style: TextStyle(fontSize: 54),
-                    ),
-                  ),
-                ),
+                const AppLogo(size: 90, blendWithBackground: true),
                 const SizedBox(height: 20),
                 const Text(
                   'BEE-Alert',

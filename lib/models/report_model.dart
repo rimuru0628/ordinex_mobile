@@ -8,14 +8,16 @@ class ReportModel {
   final String category;
   final String description;
   final String? imageUrl;
+  final String? videoUrl;
   final double? latitude;
   final double? longitude;
   final String location;
-  final String status; // 'Pending', 'Ongoing', 'Completed'
+  final String status;
   final DateTime submittedAt;
   final DateTime updatedAt;
-  final String reportReference; // RPT-{timestamp}-{random}
-  final String? lastUpdate; // Latest comment from municipal office
+  final String reportReference;
+  final String? lastUpdate;
+  final String? cancellationReason;
 
   const ReportModel({
     required this.id,
@@ -25,6 +27,7 @@ class ReportModel {
     required this.category,
     required this.description,
     this.imageUrl,
+    this.videoUrl,
     this.latitude,
     this.longitude,
     required this.location,
@@ -33,6 +36,7 @@ class ReportModel {
     required this.updatedAt,
     required this.reportReference,
     this.lastUpdate,
+    this.cancellationReason,
   });
 
   Map<String, dynamic> toMap() => {
@@ -42,6 +46,7 @@ class ReportModel {
         'category': category,
         'description': description,
         'imageUrl': imageUrl,
+        'videoUrl': videoUrl,
         'latitude': latitude,
         'longitude': longitude,
         'location': location,
@@ -50,6 +55,7 @@ class ReportModel {
         'updatedAt': Timestamp.fromDate(updatedAt),
         'reportReference': reportReference,
         'lastUpdate': lastUpdate,
+        'cancellationReason': cancellationReason,
       };
 
   factory ReportModel.fromMap(Map<String, dynamic> map, String id) =>
@@ -61,6 +67,7 @@ class ReportModel {
         category: map['category'] as String? ?? '',
         description: map['description'] as String? ?? '',
         imageUrl: map['imageUrl'] as String?,
+        videoUrl: map['videoUrl'] as String?,
         latitude: (map['latitude'] as num?)?.toDouble(),
         longitude: (map['longitude'] as num?)?.toDouble(),
         location: map['location'] as String? ?? '',
@@ -73,6 +80,7 @@ class ReportModel {
             : DateTime.now(),
         reportReference: map['reportReference'] as String? ?? '',
         lastUpdate: map['lastUpdate'] as String?,
+        cancellationReason: map['cancellationReason'] as String?,
       );
 
   factory ReportModel.fromDoc(DocumentSnapshot doc) =>

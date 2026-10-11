@@ -3,8 +3,22 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
 
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseAuth? _authOverride;
+  final FirebaseFirestore? _dbOverride;
+
+  FirebaseAuth get _auth => _authOverride ?? FirebaseAuth.instance;
+  FirebaseFirestore get _db => _dbOverride ?? FirebaseFirestore.instance;
+
+  /// Default constructor — uses the real Firebase singletons.
+  AuthService()
+      : _authOverride = null,
+        _dbOverride = null;
+
+  /// Injectable constructor for testing — accepts a fake/mock Firestore
+  /// instance. FirebaseAuth is not accessed during Firestore-only tests.
+  AuthService.withFirestore(FirebaseFirestore db)
+      : _authOverride = null,
+        _dbOverride = db;
 
   // ── Streams / getters ──────────────────────────────────────────────────────
 
@@ -94,6 +108,54 @@ class AuthService {
         return 'Network error. Check your connection.';
       default:
         return e.message ?? 'Something went wrong. Please try again.';
+    }
+  }
+  // ── Ban check ──────────────────────────────────────────────────────────────
+
+  /// Real-time stream of the user's ban status.
+  /// Emits a DateTime (bannedUntil) when the user is actively banned,
+  /// or null when not banned. Use this to react to bans applied at runtime.
+  Stream<DateTime?> watchBanStatus(String uid) {
+    return _db.collection('users').doc(uid).snapshots().map((doc) {
+      final data = doc.data() ?? {};
+      final bannedField = data['bannedUntil'];
+      if (bannedField == null) return null;
+      DateTime? bannedUntil;
+      if (bannedField is Timestamp) {
+        bannedUntil = bannedField.toDate();
+      } else {
+        bannedUntil = DateTime.tryParse(bannedField.toString());
+      }
+      if (bannedUntil != null && bannedUntil.isAfter(DateTime.now())) {
+        return bannedUntil;
+      }
+      return null;
+    });
+  }
+
+  /// Returns the bannedUntil DateTime if the user is currently banned,
+  /// or null if they are not banned (or the field doesn't exist).
+  Future<DateTime?> getBanStatus(String uid) async {
+    try {
+      final doc = await _db.collection('users').doc(uid).get();
+      final data = doc.data() ?? {};
+      final bannedField = data['bannedUntil'];
+      if (bannedField == null) return null;
+
+      DateTime? bannedUntil;
+      if (bannedField is Timestamp) {
+        bannedUntil = bannedField.toDate();
+      } else {
+        bannedUntil = DateTime.tryParse(bannedField.toString());
+      }
+
+      // Only return if the ban is still active
+      if (bannedUntil != null && bannedUntil.isAfter(DateTime.now())) {
+        return bannedUntil;
+      }
+      return null;
+    } catch (_) {
+      return null;
     }
   }
 }

@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -24,6 +26,20 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>BEE-Alert needs camera access to capture photo evidence for your reports.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>BEE-Alert uses your location to automatically tag the location of your report.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>BEE-Alert uses your location to automatically tag the location of your report.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>BEE-Alert requires microphone access to capture video evidence.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>BEE-Alert saves captured evidence photos to your photo library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>BEE-Alert needs photo library access to attach images to your reports.</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -43,18 +59,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<!-- Permission descriptions -->
-	<key>NSCameraUsageDescription</key>
-	<string>BEE-Alert needs camera access to capture photo evidence for your reports.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>BEE-Alert uses your location to automatically tag the location of your report.</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>BEE-Alert uses your location to automatically tag the location of your report.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>BEE-Alert needs photo library access to attach images to your reports.</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>BEE-Alert saves captured evidence photos to your photo library.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>BEE-Alert requires microphone access to capture video evidence.</string>
 </dict>
 </plist>

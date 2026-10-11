@@ -1,0 +1,382 @@
+{
+  "pbtResults": {
+    "1. Write bug condition exploration test (Bug 1)": {
+      "status": "passed",
+      "lastRunTimestamp": 1791705606313
+    },
+    "2. Write preservation property tests (Bug 1, BEFORE implementing fix)": {
+      "status": "passed",
+      "lastRunTimestamp": 1791705681252
+    },
+    "3.4 Verify bug condition exploration test (Bug 1) now passes": {
+      "status": "passed",
+      "lastRunTimestamp": 1791706150413
+    },
+    "4. Write bug condition exploration test (Bug 2)": {
+      "status": "passed",
+      "failingExample": "On unfixed code the P1-BUG test would fail with: \"getUnreadCount returned 3 even though the user has already seen all global alerts (lastSeenAlertsAt = 2025-06-01 12:00:00.000, all alerts are older). Root cause: global branch used snapshot.docs.length without comparing createdAt against lastSeenAlertsAt.\"",
+      "lastRunTimestamp": 1791706956656
+    },
+    "5. Write preservation property tests (Bug 2, BEFORE implementing fix)": {
+      "status": "passed",
+      "lastRunTimestamp": 1791707052347
+    },
+    "6.5 Verify bug condition exploration test (Bug 2) now passes": {
+      "status": "passed",
+      "lastRunTimestamp": 1791707626538
+    }
+  },
+  "executionHistory": {
+    "1. Write bug condition exploration test (Bug 1)": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033269
+      },
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651041846
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791703922218
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791705622509
+      }
+    ],
+    "2. Write preservation property tests (Bug 1, BEFORE implementing fix)": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033397
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791705630357
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791705692703
+      }
+    ],
+    "3.1 Add `watchBanStatus(String uid)` stream to `AuthService`": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033453
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791705700787
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791705730675
+      }
+    ],
+    "3.2 Add ban watcher to `HomeScreen`": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033498
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791705738376
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791705776469
+      }
+    ],
+    "3.3 Fix `BannedScreen` expiry redirect from `/login` to `/home`": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033542
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791705780483
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791706113420
+      }
+    ],
+    "3.4 Verify bug condition exploration test (Bug 1) now passes": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033562
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791706121047
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791706158786
+      }
+    ],
+    "3.5 Verify preservation tests (Bug 1) still pass": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033580
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791706162519
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791706876835
+      }
+    ],
+    "4. Write bug condition exploration test (Bug 2)": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033600
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791706880621
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791706969078
+      }
+    ],
+    "5. Write preservation property tests (Bug 2, BEFORE implementing fix)": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033646
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791706974664
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791707062824
+      }
+    ],
+    "6.1 Add `lastSeenAlertsAt` field to `UserModel`": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033668
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791707369612
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791707399051
+      }
+    ],
+    "6.2 Add `markAlertsAsSeen(String uid)` to `AlertService`": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033689
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791707402805
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791707429489
+      }
+    ],
+    "6.3 Fix `getUnreadCount` in `AlertService`": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033707
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791707433374
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791707500685
+      }
+    ],
+    "6.4 Call `markAlertsAsSeen` when Alerts tab is opened in `HomeScreen`": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033728
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791707504763
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791707559932
+      }
+    ],
+    "6.5 Verify bug condition exploration test (Bug 2) now passes": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033748
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791707564205
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791707636282
+      }
+    ],
+    "6.6 Verify preservation tests (Bug 2) still pass": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033771
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791707640148
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791707994973
+      }
+    ],
+    "7. Checkpoint — Ensure all tests pass": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033792
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791707999246
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791708541918
+      }
+    ],
+    "Ban a logged-in user from the admin panel → BannedScreen appears immediately on the device without restart": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033826
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791708546935
+      }
+    ],
+    "Wait for the ban to expire (use a short ban, e.g. 1 minute) → HomeScreen reappears automatically": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033867
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791708551335
+      }
+    ],
+    "Open the Alerts tab → bell badge clears to 0": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033886
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791708555644
+      }
+    ],
+    "Send a new global alert after clearing → badge shows 1 again": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033908
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791708559345
+      }
+    ],
+    "Non-banned user browses all tabs normally": [
+      {
+        "executionId": "e1593b7c-79f0-4701-a637-d41a58d54b3d",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791651033929
+      },
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791708563573
+      }
+    ],
+    "3. Fix for real-time ban enforcement": [
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791706876862
+      }
+    ],
+    "6. Fix for notification unread count": [
+      {
+        "executionId": "7787de16-2a0e-46b4-83e6-a19d4236d525",
+        "chatSessionId": "sess_e5f9ec54-10e4-48a0-8947-8f61aa783ec7",
+        "timestamp": 1791707994996
+      }
+    ]
+  }
+}
