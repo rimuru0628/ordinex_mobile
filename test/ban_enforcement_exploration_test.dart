@@ -15,6 +15,7 @@
 ///   "HomeScreen remains on screen after bannedUntil was set — no navigation
 ///    occurred, because AuthService had no watchBanStatus stream and HomeScreen
 ///    had no real-time Firestore listener on users/{uid}."
+library;
 
 // ignore_for_file: avoid_print
 
@@ -39,7 +40,7 @@ void main() {
     // -------------------------------------------------------------------------
     // Helper: write the user document (no ban initially)
     // -------------------------------------------------------------------------
-    Future<void> _createUnbannedUser() async {
+    Future<void> createUnbannedUser() async {
       await fakeFirestore.collection('users').doc(testUid).set({
         'uid': testUid,
         'fullName': 'Test User',
@@ -64,7 +65,7 @@ void main() {
       'P1-BUG: watchBanStatus emits non-null DateTime when bannedUntil is '
       'written to Firestore while the stream is active',
       () async {
-        await _createUnbannedUser();
+        await createUnbannedUser();
 
         final emissions = <DateTime?>[];
 
@@ -172,7 +173,7 @@ void main() {
       'P1-SUPPLEMENTAL: watchBanStatus emits null when bannedUntil field '
       'is not present',
       () async {
-        await _createUnbannedUser();
+        await createUnbannedUser();
 
         final emissions = <DateTime?>[];
         final subscription =

@@ -16,6 +16,7 @@
 ///      splash flow is preserved).
 ///   5. `getBanStatus()` returns a non-null DateTime for an actively banned
 ///      user (login/splash ban check still works after the fix).
+library;
 
 // ignore_for_file: avoid_print
 

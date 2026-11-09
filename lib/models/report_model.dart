@@ -18,6 +18,9 @@ class ReportModel {
   final String reportReference;
   final String? lastUpdate;
   final String? cancellationReason;
+  final String imageAiCheckStatus;
+  final double? imageAiConfidence;
+  final DateTime? imageAiCheckedAt;
 
   const ReportModel({
     required this.id,
@@ -37,6 +40,9 @@ class ReportModel {
     required this.reportReference,
     this.lastUpdate,
     this.cancellationReason,
+    this.imageAiCheckStatus = 'not_checked',
+    this.imageAiConfidence,
+    this.imageAiCheckedAt,
   });
 
   Map<String, dynamic> toMap() => {
@@ -58,30 +64,44 @@ class ReportModel {
         'cancellationReason': cancellationReason,
       };
 
-  factory ReportModel.fromMap(Map<String, dynamic> map, String id) =>
-      ReportModel(
-        id: id,
-        userId: map['userId'] as String? ?? '',
-        userName: map['userName'] as String? ?? '',
-        barangay: map['barangay'] as String? ?? '',
-        category: map['category'] as String? ?? '',
-        description: map['description'] as String? ?? '',
-        imageUrl: map['imageUrl'] as String?,
-        videoUrl: map['videoUrl'] as String?,
-        latitude: (map['latitude'] as num?)?.toDouble(),
-        longitude: (map['longitude'] as num?)?.toDouble(),
-        location: map['location'] as String? ?? '',
-        status: map['status'] as String? ?? 'Pending',
-        submittedAt: map['submittedAt'] is Timestamp
-            ? (map['submittedAt'] as Timestamp).toDate()
-            : DateTime.now(),
-        updatedAt: map['updatedAt'] is Timestamp
-            ? (map['updatedAt'] as Timestamp).toDate()
-            : DateTime.now(),
-        reportReference: map['reportReference'] as String? ?? '',
-        lastUpdate: map['lastUpdate'] as String?,
-        cancellationReason: map['cancellationReason'] as String?,
-      );
+  factory ReportModel.fromMap(Map<String, dynamic> map, String id) {
+    final imageAiCheck = map['imageAiCheck'] is Map
+        ? Map<String, dynamic>.from(map['imageAiCheck'] as Map)
+        : const <String, dynamic>{};
+
+    return ReportModel(
+      id: id,
+      userId: map['userId'] as String? ?? '',
+      userName: map['userName'] as String? ?? '',
+      barangay: map['barangay'] as String? ?? '',
+      category: map['category'] as String? ?? '',
+      description: map['description'] as String? ?? '',
+      imageUrl: map['imageUrl'] as String?,
+      videoUrl: map['videoUrl'] as String?,
+      latitude: (map['latitude'] as num?)?.toDouble(),
+      longitude: (map['longitude'] as num?)?.toDouble(),
+      location: map['location'] as String? ?? '',
+      status: map['status'] as String? ?? 'Pending',
+      submittedAt: map['submittedAt'] is Timestamp
+          ? (map['submittedAt'] as Timestamp).toDate()
+          : DateTime.now(),
+      updatedAt: map['updatedAt'] is Timestamp
+          ? (map['updatedAt'] as Timestamp).toDate()
+          : DateTime.now(),
+      reportReference: map['reportReference'] as String? ?? '',
+      lastUpdate: map['lastUpdate'] as String?,
+      cancellationReason: map['cancellationReason'] as String?,
+      imageAiCheckStatus: imageAiCheck['status'] as String? ??
+          ((map['imageUrl'] as String?)?.isNotEmpty == true
+              ? 'pending'
+              : 'not_checked'),
+      imageAiConfidence:
+          (imageAiCheck['aiGeneratedConfidence'] as num?)?.toDouble(),
+      imageAiCheckedAt: imageAiCheck['checkedAt'] is Timestamp
+          ? (imageAiCheck['checkedAt'] as Timestamp).toDate()
+          : null,
+    );
+  }
 
   factory ReportModel.fromDoc(DocumentSnapshot doc) =>
       ReportModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);

@@ -100,9 +100,10 @@ class AlertService {
   /// Records that the user has seen all global alerts up to now.
   /// Call this when the user opens the Alerts tab.
   Future<void> markAlertsAsSeen(String uid) async {
-    await _db.collection('users').doc(uid).update({
-      'lastSeenAlertsAt': FieldValue.serverTimestamp(),
-    });
+    await _db.collection('users').doc(uid).set(
+      {'lastSeenAlertsAt': FieldValue.serverTimestamp()},
+      SetOptions(merge: true),
+    );
   }
 
   // ── Mark a personal notification as read ──────────────────────────────────

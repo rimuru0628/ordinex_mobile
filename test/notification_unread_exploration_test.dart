@@ -24,6 +24,7 @@
 ///
 /// On UNFIXED code: P1-BUG emits 3 → test FAILS (confirms bug exists).
 /// On FIXED code  : P1-BUG emits 0 → test PASSES (confirms fix is correct).
+library;
 
 // ignore_for_file: avoid_print
 
@@ -51,7 +52,7 @@ void main() {
     // -----------------------------------------------------------------------
     // Helper: set up the user document with optional lastSeenAlertsAt
     // -----------------------------------------------------------------------
-    Future<void> _createUser({DateTime? lastSeenAlertsAt}) async {
+    Future<void> createUser({DateTime? lastSeenAlertsAt}) async {
       final doc = <String, dynamic>{
         'uid': testUid,
         'fullName': 'Notif Test User',
@@ -73,7 +74,7 @@ void main() {
     // Helper: seed N global alert documents, each [offsetMinutes] minutes
     // before [now] (negative offset = in the past).
     // -----------------------------------------------------------------------
-    Future<void> _addGlobalAlert({
+    Future<void> addGlobalAlert({
       required String id,
       required DateTime createdAt,
     }) async {
@@ -90,7 +91,7 @@ void main() {
     // -----------------------------------------------------------------------
     // Helper: add an unread personal notification for testUid
     // -----------------------------------------------------------------------
-    Future<void> _addPersonalNotification(String id) async {
+    Future<void> addPersonalNotification(String id) async {
       await fakeFirestore
           .collection('users')
           .doc(testUid)
@@ -118,17 +119,17 @@ void main() {
       '(lastSeenAlertsAt is newer than every alert)',
       () async {
         // Arrange: lastSeenAlertsAt = now; all 3 alerts are from 1–3 hours ago.
-        await _createUser(lastSeenAlertsAt: now);
+        await createUser(lastSeenAlertsAt: now);
 
-        await _addGlobalAlert(
+        await addGlobalAlert(
           id: 'alert-1',
           createdAt: now.subtract(const Duration(hours: 1)),
         );
-        await _addGlobalAlert(
+        await addGlobalAlert(
           id: 'alert-2',
           createdAt: now.subtract(const Duration(hours: 2)),
         );
-        await _addGlobalAlert(
+        await addGlobalAlert(
           id: 'alert-3',
           createdAt: now.subtract(const Duration(hours: 3)),
         );
@@ -170,28 +171,28 @@ void main() {
       () async {
         // lastSeenAlertsAt = 2.5 hours ago from now.
         final lastSeen = now.subtract(const Duration(hours: 2, minutes: 30));
-        await _createUser(lastSeenAlertsAt: lastSeen);
+        await createUser(lastSeenAlertsAt: lastSeen);
 
         // 2 alerts are newer than lastSeen (1 h and 2 h ago).
-        await _addGlobalAlert(
+        await addGlobalAlert(
           id: 'new-1',
           createdAt: now.subtract(const Duration(hours: 1)),
         );
-        await _addGlobalAlert(
+        await addGlobalAlert(
           id: 'new-2',
           createdAt: now.subtract(const Duration(hours: 2)),
         );
 
         // 3 alerts are older than lastSeen (3 h, 4 h, 5 h ago).
-        await _addGlobalAlert(
+        await addGlobalAlert(
           id: 'old-1',
           createdAt: now.subtract(const Duration(hours: 3)),
         );
-        await _addGlobalAlert(
+        await addGlobalAlert(
           id: 'old-2',
           createdAt: now.subtract(const Duration(hours: 4)),
         );
-        await _addGlobalAlert(
+        await addGlobalAlert(
           id: 'old-3',
           createdAt: now.subtract(const Duration(hours: 5)),
         );
@@ -219,17 +220,17 @@ void main() {
       '(user has never opened the Alerts tab)',
       () async {
         // No lastSeenAlertsAt field in user document.
-        await _createUser(lastSeenAlertsAt: null);
+        await createUser(lastSeenAlertsAt: null);
 
-        await _addGlobalAlert(
+        await addGlobalAlert(
           id: 'a1',
           createdAt: now.subtract(const Duration(hours: 1)),
         );
-        await _addGlobalAlert(
+        await addGlobalAlert(
           id: 'a2',
           createdAt: now.subtract(const Duration(hours: 2)),
         );
-        await _addGlobalAlert(
+        await addGlobalAlert(
           id: 'a3',
           createdAt: now.subtract(const Duration(hours: 3)),
         );
@@ -256,7 +257,7 @@ void main() {
       'P1-SUPPLEMENTAL: getUnreadCount emits 0 when there are no global '
       'alerts and no personal notifications',
       () async {
-        await _createUser(lastSeenAlertsAt: now);
+        await createUser(lastSeenAlertsAt: now);
         // No alerts or notifications seeded.
 
         final count = await alertService

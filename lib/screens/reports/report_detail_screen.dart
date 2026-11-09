@@ -639,6 +639,20 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                     ),
                   ],
 
+                  if (r.imageUrl != null) ...[
+                    const SizedBox(height: 8),
+                    StreamBuilder<ReportModel?>(
+                      stream: _reportService.watchReport(r.id),
+                      builder: (context, snapshot) {
+                        final currentReport = snapshot.data ?? r;
+                        if (currentReport.imageAiCheckStatus == 'not_checked') {
+                          return const SizedBox.shrink();
+                        }
+                        return _imageAiCheckNotice(currentReport);
+                      },
+                    ),
+                  ],
+
                   // ── Last update from office ────────────────
                   if (r.lastUpdate != null &&
                       r.lastUpdate!.isNotEmpty) ...[
@@ -807,6 +821,83 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                   const SizedBox(height: 16),
                 ],
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _imageAiCheckNotice(ReportModel report) {
+    final status = report.imageAiCheckStatus;
+    final color = switch (status) {
+      'flagged' => const Color(0xFFB91C1C),
+      'clear' => const Color(0xFF15803D),
+      _ => const Color(0xFFB45309),
+    };
+    final message = switch (status) {
+      'pending' || 'checking' => 'Automated image check is in progress.',
+      'flagged' =>
+        'This image has a strong AI-generation signal. Staff should verify it; this automated result is not a final determination.',
+      'clear' =>
+        'No strong AI-generation signal was detected. This check does not prove that the image is authentic.',
+      'inconclusive' =>
+        'The automated image check was inconclusive. Staff should verify the evidence.',
+      'unavailable' =>
+        'The automated image check was unavailable. Staff should verify the evidence.',
+      _ => 'Image check status: $status',
+    };
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            status == 'clear' ? Icons.verified_outlined : Icons.info_outline,
+            size: 17,
+            color: color,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Automated image check',
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  message,
+                  style: const TextStyle(
+                    color: Color(0xFF4B5563),
+                    fontSize: 11,
+                    height: 1.4,
+                  ),
+                ),
+                if (report.imageAiConfidence != null &&
+                    (status == 'flagged' || status == 'inconclusive')) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    'AI-generation detector score: ${(report.imageAiConfidence! * 100).toStringAsFixed(0)}%',
+                    style: const TextStyle(
+                      color: Color(0xFF6B7280),
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
         ],

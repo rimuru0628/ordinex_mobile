@@ -30,6 +30,9 @@ class ReportService {
         folder: 'reports',
         resourceType: 'image',
       );
+      if (imageUrl == null) {
+        throw StateError('The photo could not be uploaded. Check your connection and try again.');
+      }
     }
 
     if (videoFile != null) {
@@ -38,10 +41,15 @@ class ReportService {
         folder: 'reports',
         resourceType: 'video',
       );
+      if (videoUrl == null) {
+        throw StateError('The video could not be uploaded. Check your connection and try again.');
+      }
     }
 
     final data = report.toMap();
-    if (imageUrl != null) data['imageUrl'] = imageUrl;
+    if (imageUrl != null) {
+      data['imageUrl'] = imageUrl;
+    }
     if (videoUrl != null) data['videoUrl'] = videoUrl;
 
     final docRef = await _db.collection('reports').add(data);
@@ -49,25 +57,34 @@ class ReportService {
 
     // Notify admin immediately — fires regardless of which tab is open
     _db.collection('admin_notifications').add({
-      'type': 'new_report',
-      'title': 'New Report: ${report.category}',
-      'body':
-          '${report.userName.isNotEmpty ? report.userName : 'A resident'} submitted a ${report.category} report. Ref: ${report.reportReference}',
-      'meta': {
-        'reportId': docId,
-        'reportRef': report.reportReference,
-        'userId': report.userId,
-        'residentName': report.userName,
-        'category': report.category,
-      },
-      'read': false,
-      'createdAt': FieldValue.serverTimestamp(),
-    }).catchError((Object _) => _db.collection('admin_notifications').doc());
+        'type': 'new_report',
+        'title': 'New Report: ${report.category}',
+        'body':
+            '${report.userName.isNotEmpty ? report.userName : 'A resident'} submitted a ${report.category} report. Ref: ${report.reportReference}',
+        'meta': {
+          'reportId': docId,
+          'reportRef': report.reportReference,
+          'userId': report.userId,
+          'residentName': report.userName,
+          'category': report.category,
+        },
+        'read': false,
+        'createdAt': FieldValue.serverTimestamp(),
+      }).then<void>((_) {}, onError: (Object _) {
+        // Report creation has already succeeded; notification delivery is best effort.
+      });
 
     return docId;
   }
 
-  /// Real-time stream of all reports for a given user
+  /// Real-time stream of one report, including its asynchronous image check.
+  Stream<ReportModel?> watchReport(String reportId) {
+    return _db.collection('reports').doc(reportId).snapshots().map(
+          (doc) => doc.exists ? ReportModel.fromDoc(doc) : null,
+        );
+  }
+
+  /// Real-time stream of all reports for a given user.
   Stream<List<ReportModel>> getUserReports(String uid) {
     return _db
         .collection('reports')

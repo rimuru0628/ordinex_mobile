@@ -1,5 +1,5 @@
 /// Bug 2 Preservation Tests — Personal Notification Read Tracking is Unchanged
-///
+///https://github.com/rimuru0628/ordinex_mobile.git
 /// **Validates: Requirements 2.3**
 ///
 /// Property 2 (Preservation): The Bug 2 fix (adding lastSeenAlertsAt-based
@@ -23,6 +23,7 @@
 ///   6. [P2-PRESERVATION-6] getAlerts() stream returns all global alerts.
 ///   7. [P2-PRESERVATION-7] getUserNotifications(uid) stream returns all
 ///      personal notifications.
+library;
 
 // ignore_for_file: avoid_print
 
@@ -53,7 +54,7 @@ void main() {
 
     /// Create the user document.  [lastSeenAlertsAt] is optional — when null
     /// the field is omitted (simulates a first-time user).
-    Future<void> _createUser({DateTime? lastSeenAlertsAt}) async {
+    Future<void> createUser({DateTime? lastSeenAlertsAt}) async {
       final doc = <String, dynamic>{
         'uid': testUid,
         'fullName': 'Preservation User',
@@ -73,7 +74,7 @@ void main() {
 
     /// Seed a personal notification for [testUid].
     /// [read] defaults to false (unread).
-    Future<void> _addPersonalNotification(
+    Future<void> addPersonalNotification(
       String id, {
       bool read = false,
       DateTime? createdAt,
@@ -95,7 +96,7 @@ void main() {
     }
 
     /// Seed a global alert document.
-    Future<void> _addGlobalAlert(
+    Future<void> addGlobalAlert(
       String id, {
       required DateTime createdAt,
     }) async {
@@ -122,10 +123,10 @@ void main() {
       () async {
         // Arrange: user with lastSeenAlertsAt = now; 3 unread personal notifs;
         // no global alerts seeded.
-        await _createUser(lastSeenAlertsAt: now);
-        await _addPersonalNotification('n1');
-        await _addPersonalNotification('n2');
-        await _addPersonalNotification('n3');
+        await createUser(lastSeenAlertsAt: now);
+        await addPersonalNotification('n1');
+        await addPersonalNotification('n2');
+        await addPersonalNotification('n3');
 
         // Act: first emission from the stream.
         final count = await alertService
@@ -153,12 +154,12 @@ void main() {
       'P2-PRESERVATION-2: Personal notifications with read == true are NOT '
       'counted by getUnreadCount',
       () async {
-        await _createUser(lastSeenAlertsAt: now);
+        await createUser(lastSeenAlertsAt: now);
 
         // 2 read, 1 unread.
-        await _addPersonalNotification('read-1', read: true);
-        await _addPersonalNotification('read-2', read: true);
-        await _addPersonalNotification('unread-1', read: false);
+        await addPersonalNotification('read-1', read: true);
+        await addPersonalNotification('read-2', read: true);
+        await addPersonalNotification('unread-1', read: false);
 
         final count = await alertService
             .getUnreadCount(uid: testUid)
@@ -185,10 +186,10 @@ void main() {
       'P2-PRESERVATION-3: markRead(uid, notifId) sets read: true on the '
       'correct document and count stream reflects the change',
       () async {
-        await _createUser(lastSeenAlertsAt: now);
+        await createUser(lastSeenAlertsAt: now);
 
-        await _addPersonalNotification('target', read: false);
-        await _addPersonalNotification('other', read: false);
+        await addPersonalNotification('target', read: false);
+        await addPersonalNotification('other', read: false);
 
         // Collect count emissions: we expect [2, 1].
         final counts = <int>[];
@@ -250,11 +251,11 @@ void main() {
       'P2-PRESERVATION-4: markAllRead(uid) sets read: true on every unread '
       'personal notification and count stream drops to 0',
       () async {
-        await _createUser(lastSeenAlertsAt: now);
+        await createUser(lastSeenAlertsAt: now);
 
-        await _addPersonalNotification('n1');
-        await _addPersonalNotification('n2');
-        await _addPersonalNotification('n3');
+        await addPersonalNotification('n1');
+        await addPersonalNotification('n2');
+        await addPersonalNotification('n3');
 
         final counts = <int>[];
         final subscription =
@@ -307,20 +308,20 @@ void main() {
       () async {
         // lastSeenAlertsAt = 2.5 hours ago.
         final lastSeen = now.subtract(const Duration(hours: 2, minutes: 30));
-        await _createUser(lastSeenAlertsAt: lastSeen);
+        await createUser(lastSeenAlertsAt: lastSeen);
 
         // 2 unread personal notifications.
-        await _addPersonalNotification('p1');
-        await _addPersonalNotification('p2');
+        await addPersonalNotification('p1');
+        await addPersonalNotification('p2');
 
         // 2 new global alerts (after lastSeen).
-        await _addGlobalAlert('new-a1',
+        await addGlobalAlert('new-a1',
             createdAt: now.subtract(const Duration(hours: 1)));
-        await _addGlobalAlert('new-a2',
+        await addGlobalAlert('new-a2',
             createdAt: now.subtract(const Duration(hours: 2)));
 
         // 1 old global alert (before lastSeen — already seen).
-        await _addGlobalAlert('old-a1',
+        await addGlobalAlert('old-a1',
             createdAt: now.subtract(const Duration(hours: 3)));
 
         final count = await alertService
@@ -348,11 +349,11 @@ void main() {
       'ordered newest-first',
       () async {
         // Seed 3 alerts with distinct timestamps.
-        await _addGlobalAlert('g1',
+        await addGlobalAlert('g1',
             createdAt: now.subtract(const Duration(hours: 1)));
-        await _addGlobalAlert('g2',
+        await addGlobalAlert('g2',
             createdAt: now.subtract(const Duration(hours: 2)));
-        await _addGlobalAlert('g3',
+        await addGlobalAlert('g3',
             createdAt: now.subtract(const Duration(hours: 3)));
 
         final alerts = await alertService
@@ -400,14 +401,14 @@ void main() {
       'P2-PRESERVATION-7: getUserNotifications(uid) stream returns all '
       'personal notifications for the user ordered newest-first',
       () async {
-        await _createUser();
+        await createUser();
 
         // Seed 3 personal notifications with distinct timestamps.
-        await _addPersonalNotification('pn1',
+        await addPersonalNotification('pn1',
             createdAt: now.subtract(const Duration(hours: 1)));
-        await _addPersonalNotification('pn2',
+        await addPersonalNotification('pn2',
             createdAt: now.subtract(const Duration(hours: 2)));
-        await _addPersonalNotification('pn3',
+        await addPersonalNotification('pn3',
             createdAt: now.subtract(const Duration(hours: 3)));
 
         final notifications = await alertService

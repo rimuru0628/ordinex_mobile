@@ -1,1 +1,26 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"ordinex-5cfa3","appId":"1:69817565903:android:6efdea8f96bc9fca8b2dba","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"ordinex-5cfa3","configurations":{"android":"1:69817565903:android:6efdea8f96bc9fca8b2dba","web":"1:69817565903:web:463866d785caf9b48b2dba"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "ordinex-5cfa3",
+          "appId": "1:69817565903:android:6efdea8f96bc9fca8b2dba",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "ordinex-5cfa3",
+          "configurations": {
+            "android": "1:69817565903:android:6efdea8f96bc9fca8b2dba",
+            "web": "1:69817565903:web:463866d785caf9b48b2dba"
+          }
+        }
+      }
+    }
+  },
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs20"
+  }
+}
